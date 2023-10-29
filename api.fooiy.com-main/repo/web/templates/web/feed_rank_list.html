@@ -1,0 +1,46 @@
+<html>
+
+<head>
+    <title>web_info</title>
+
+</head>
+
+<body>
+    <div>
+        <h1> 이번 주 포크 수 순위</h1>
+        <div style="width: 1000px; display: flex; justify-content: space-around;">
+            <span style="width:80%">
+                {% for feed in feeds %}
+                <div style="height:150px;">
+                    피드 id : {{feed.id}} <strong>[포크 개수 : {{feed.count}}]</strong><br>
+                    상호명 : <strong>{{feed.shop.name}}</strong><br>
+                    주소 : <strong>{{feed.shop.address}}</strong><br>
+                    메뉴명 : <strong>{{feed.menu.name}}</strong><br>
+                    가격 : <strong>{{feed.menu.price}}</strong><br>
+                    유저 닉네임 : <strong>{{feed.account.nickname}}</strong><br>
+                    매장 푸이티아이 : <strong>{{feed.shop.shopfooiyti.fooiyti}}</strong>
+                </div>
+                <div style="height: 10px;"></div>
+                {% endfor %}
+
+            </span>
+
+            <span style="width:20%; text-align: left;">
+                {% for image in images %}
+                <div>
+                    <img src="{{image}}" style="width:150px; height:150px;">
+                </div>
+                <div style="height: 10px;"></div>
+                {% endfor %}
+            </span>
+        </div>
+
+        <br>
+
+        <br>
+        <span style="color:red">* 사이트 접속 시간 기준 7일전까지 생성된 피드에서 포크갯수로 순위를 정합니다. </span>
+    </div>
+
+    <body>
+
+</html>

@@ -1,0 +1,1 @@
+from .spot_serializer import SpotSearchSerializer

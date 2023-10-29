@@ -1,0 +1,12 @@
+{% extends 'admin/change_form.html' %}
+
+{% block submit_buttons_bottom %}
+{{ block.super }}
+<div class="submit-row" style="display: flex; flex-direction: column;">
+    <div style="display: flex; flex-direction: row;">
+        <input style="float: left; height: 16px; width: 30%;" type="text" placeholder="제목" name="title" />
+        <input style="float: left; height: 16px; width: 60%;" type="text" placeholder="내용" name="content" />
+        <input style="background:rgb(213, 58, 58)" type="submit" value="푸시 전송" name="push-notification" />
+    </div>
+</div>
+{% endblock %}

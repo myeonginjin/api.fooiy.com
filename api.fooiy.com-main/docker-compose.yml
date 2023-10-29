@@ -1,0 +1,49 @@
+version: "3"
+
+services:
+  redis:
+    image: redis:latest
+    container_name: fooiy-api-redis.fooiy
+    command: redis-server /etc/redis.conf
+    volumes:
+      - ./redis.conf:/etc/redis.conf
+    ports:
+      - "6379:6379"
+
+  fooiy-api:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    tty: true
+    ports:
+      - "80:80"
+    volumes:
+      - ./repo:/srv/repo/
+
+    links:
+      - redis
+    depends_on:
+      - redis
+
+  # celery:
+  #   environment:
+  #     - C_FORCE_ROOT=true
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile
+  #   tty: true
+  #   volumes:
+  #     - ./repo:/srv/repo/
+  #   command:
+  #     - celery
+
+  
+  # redis-commander:
+  #   container_name: redis-commander
+  #   hostname: redis-commander
+  #   image: rediscommander/redis-commander:latest
+  #   restart: always
+  #   environment:
+  #     - REDIS_HOSTS=local:fooiy-api-redis.fooiy:6379
+  #   ports:
+  #     - "8081:8081"

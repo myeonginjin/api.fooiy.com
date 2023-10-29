@@ -1,0 +1,4 @@
+# no .pyc files
+*.pyc
+*.DS_Store
+# env.py
