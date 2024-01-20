@@ -1,0 +1,77 @@
+name: Deploy
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: DEV, Get Github Actions IP
+        id: ip-dev
+        uses: haythem/public-ip@v1.2
+
+      - name: DEV, Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEV_AWS_SECRET_KEY }}
+          aws-region: ap-northeast-2
+
+
+      - name: DEV, Deploy Dev Api server
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.DEV_AWS_SSH_HOST }}
+          username: ${{ secrets.AWS_SSH_USERNAME }}
+          key: ${{ secrets.DEV_AWS_SSH_KEY }}
+          port: ${{ secrets.AWS_SSH_PORT }}
+          script_stop: true
+          script: |
+            cd api.fooiy.com
+            rm ./repo/fooiy/env.py
+            git pull origin develop
+
+            cp ${{ secrets.DEV_ENV }} ./repo/fooiy/env.py
+            sudo docker-compose down
+            sudo docker-compose up --build -d
+
+          
+      - name: ADMIN, Get Github Actions IP
+        id: ip
+        uses: haythem/public-ip@v1.2
+
+      - name: ADMIN, Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: ADMIN, Add Github Actions IP to Security group 
+        run: | 
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.ADMIN_API_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+      
+      - name: ADMIN, Deploy API Server
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.ADMIN_API_SSH_HOST }}
+          username: ${{ secrets.ADMIN_API_SSH_USERNAME }}
+          key: ${{ secrets.ADMIN_API_SSH_KEY }}
+          port: ${{ secrets.AWS_SSH_PORT }}
+          script_stop: true
+          script: |
+            cd api.fooiy.com
+            rm ./repo/fooiy/env.py
+            rm ./docker-compose.yml
+            git pull origin develop
+            
+            cp ../${{ secrets.ADMIN_ENV }} ./repo/fooiy/env.py
+            cp ../docker-compose.yml ./docker-compose.yml
+             sudo docker-compose down
+             sudo docker-compose up --build -d
+             
+      - name: ADMIN, Remove Github Actions IP From Security Group
+        run: |
+           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.ADMIN_API_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32

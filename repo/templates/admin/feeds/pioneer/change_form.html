@@ -1,0 +1,13 @@
+{% extends 'admin/change_form.html' %}
+
+{% block submit_buttons_bottom %}
+{{ block.super }}
+<div class="submit-row" style="display: flex; flex-direction: column;">
+    <div style="margin-bottom:15px">
+        <input style="background:green" type="submit" value="개척 성공" name="pioneer-success" />
+        <input style="background:rgb(236, 138, 27)" type="submit" value="카페 성공" name="BAKERY/CAFE" />
+        <input style="background:rgb(45, 35, 228)" type="submit" value="주점 성공" name="PUB" />
+        <input style="background:red" type="submit" value="개척 반려" name="pioneer-reject" />
+    </div>
+</div>
+{% endblock %}
